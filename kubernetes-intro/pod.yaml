@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kubernetes-intro
+  namespace: homework
+spec:
+  containers:
+    - name: homework-container
+      image: nginx:alpine
+      ports:
+        - containerPort: 8000
+      volumeMounts:
+        - name: homework-volume
+          mountPath: /homework
+      lifecycle:
+        preStop:
+          exec:
+            command: ["/bin/sh","-c","rm -f /homework/index.html"]
+  initContainers:
+    - name: init-container
+      image: busybox:latest
+      command: ['wget', '-O', '/init/index.html', 'https://tinyurl.com/otus-k8s-intro']
+      volumeMounts:
+        - name: homework-volume
+          mountPath: /init
+  volumes:
+    - name: homework-volume
+      emptyDir: {}
+  terminationGracePeriodSeconds: 30
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
