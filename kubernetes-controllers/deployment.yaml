@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: homework-deployment
+  namespace: homework
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: homework-pod
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: homework-pod
+    spec:
+      containers:
+        - name: homework-container
+          image: nginx:alpine
+          ports:
+            - containerPort: 8000
+          volumeMounts:
+            - name: homework-volume
+              mountPath: /homework
+          readinessProbe:
+            exec:
+              command:
+                - cat
+                - /homework/index.html
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      initContainers:
+        - name: init-container
+          image: busybox:latest
+          command: ['wget', '-O', '/init/index.html', 'https://tinyurl.com/otus-k8s-intro']
+          volumeMounts:
+            - name: homework-volume
+              mountPath: /init
+      volumes:
+        - name: homework-volume
+          emptyDir: {}
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      nodeSelector:
+        homework: "true"
