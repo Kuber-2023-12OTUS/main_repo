@@ -24,14 +24,14 @@ helm repo update
 helm install nginx-ingress ingress-nginx/ingress-nginx --create-namespace --namespace ingress-nginx
 ```
 
-Узнать ip minicube 
+Узнать ip ingress 
 ```shell
-minikube ip
+kubectl -n homework get ing
 ```
 
 Добавить в etc/hosts 
 ```shell
-192.168.49.2     homework.otus
+192.168.1.228     homework.otus
 ```
 ip адрес нужно заменить на полученный в предыдущем шаге
 
